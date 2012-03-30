@@ -2,12 +2,14 @@ package org.linuxstuff.mojo.licensing;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.linuxstuff.mojo.licensing.model.ArtifactWithLicenses;
+import org.linuxstuff.mojo.licensing.model.CoalescedLicense;
 import org.linuxstuff.mojo.licensing.model.LicensingReport;
 
 /**
@@ -41,6 +43,14 @@ public class CheckMojo extends AbstractLicensingMojo {
 	 */
 	protected boolean failIfDisliked;
 
+    /**
+     * Regard licenses which are not coalesced as missing.
+     * 
+     * @parameter expression="${onlyUseCoalescedLicenses}" default-value="false"
+     * @since 1.0
+     */
+    protected boolean onlyUseCoalescedLicenses;
+
 	/**
 	 * Fail the build if any dependencies are either under disliked licenses or
 	 * are missing licensing information.
@@ -69,7 +79,13 @@ public class CheckMojo extends AbstractLicensingMojo {
 
 		LicensingReport aReport = new LicensingReport();
 
-		Collection<MavenProject> projects = getProjectDependencies(project);
+        Set<CoalescedLicense> coalescedLicenses = licensingRequirements.getCoalescedLicenses();        
+        Set<String> finalLicenseNames = new HashSet<String>(coalescedLicenses.size());
+        for (CoalescedLicense lic : coalescedLicenses) {
+            finalLicenseNames.add( lic.getFinalName() );
+        }
+
+		Collection<MavenProject> projects = getProjectDependencies(project);		
 		for (MavenProject mavenProject : projects) {
 
 			ArtifactWithLicenses entry = new ArtifactWithLicenses();
@@ -84,7 +100,13 @@ public class CheckMojo extends AbstractLicensingMojo {
 				aReport.addMissingLicense(entry);
 			} else {
 				for (String license : licenses) {
-					entry.addLicense(license);
+                    if (onlyUseCoalescedLicenses && !finalLicenseNames.contains(license)) {
+                        getLog().warn("Licensing: The artifact " + 
+                                mavenProject.getId() + " has a license which is not listed: \"" + license + "\"");
+                        aReport.addMissingLicense(entry);
+				    } else {
+				        entry.addLicense(license);
+				    }
 				}
 
 				if (isDisliked(mavenProject)) {
