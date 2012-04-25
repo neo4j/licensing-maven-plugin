@@ -68,6 +68,7 @@ public class CheckMojo extends AbstractLicensingMojo {
 		File file = new File(project.getBuild().getDirectory(), thirdPartyLicensingFilename);
 
 		report.writeReport(file);
+		report.writeTextReport(null);
 
 		checkForFailure(report);
 

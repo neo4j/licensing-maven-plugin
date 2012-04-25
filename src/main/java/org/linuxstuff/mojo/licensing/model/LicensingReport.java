@@ -4,7 +4,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.linuxstuff.mojo.licensing.FileUtil;
@@ -111,6 +116,30 @@ public class LicensingReport {
 		} catch (IOException e) {
 			throw new MojoExecutionException("Failure while creating new file " + file, e);
 		}
+	}
+	
+	public void writeTextReport(File file) throws MojoExecutionException {
+
+	    SortedMap<String,SortedSet<String>> artifactsPerLicense = new TreeMap<String,SortedSet<String>>();
+        //SortedMap<String,SortedSet<String>> multiLicensed = new TreeMap<String,SortedSet<String>>();
+	    for (ArtifactWithLicenses awl : getLicensedArtifacts()) {
+	        String artifactName = awl.getName();
+	        Set<String> licenses = awl.getLicenses();
+	        for (String license : licenses) {
+	            SortedSet<String> artifacts = artifactsPerLicense.get( license );
+	            if (artifacts == null) {
+	                artifacts = new TreeSet<String>();
+	                artifactsPerLicense.put( license, artifacts );
+	            }
+	            artifacts.add( artifactName );
+	        }
+        }
+	    for ( Entry<String,SortedSet<String>> entry : artifactsPerLicense.entrySet()) {
+	        System.out.println("License: " + entry.getKey());
+	        for (String artifactName : entry.getValue()) {
+	            System.out.println(artifactName);
+	        }
+	    }
 	}
 
 }
