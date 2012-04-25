@@ -49,7 +49,15 @@ public class CheckMojo extends AbstractLicensingMojo {
 	 */
 	protected boolean includeOnlyLikedInReport;
 
-	/**
+    /**
+     * Output the result as a plain text file.
+     * 
+     * @parameter expression="${writeTextReport}" default-value="false"
+     * @since 1.0
+     */
+    protected boolean plainTextReport;
+
+    /**
 	 * Fail the build if any dependencies are either under disliked licenses or
 	 * are missing licensing information.
 	 */
@@ -67,9 +75,12 @@ public class CheckMojo extends AbstractLicensingMojo {
 
 		File file = new File(project.getBuild().getDirectory(), thirdPartyLicensingFilename);
 
-		report.writeReport(file);
-		report.writeTextReport(null);
-
+		if (plainTextReport) {
+	        report.writeTextReport(file);
+		} else {
+		    report.writeReport(file);
+		}
+		
 		checkForFailure(report);
 
 	}
