@@ -106,30 +106,43 @@ public class LicensingReport {
 		xstream.processAnnotations(LicensingReport.class);
 		xstream.processAnnotations(ArtifactWithLicenses.class);
 
+		FileOutputStream fos = null;
 		try {
 			FileUtil.createNewFile(file);
 
-			FileOutputStream fos = new FileOutputStream(file);
+			fos = new FileOutputStream(file);
 
 			xstream.toXML(this, fos);
-
-			fos.close();
 		} catch (IOException e) {
 			throw new MojoExecutionException("Failure while creating new file " + file, e);
-		}
+        } finally {
+            if (fos != null) {
+                try
+                {
+                    fos.close();
+                }
+                catch ( IOException e )
+                {
+                    throw new MojoExecutionException("Error while closing file " + file, e);
+                }            
+            }
+        }
 	}
-	
+
 	public void writeTextReport(File file) throws MojoExecutionException {
+	    PrintWriter writer = null;
         try {
             FileUtil.createNewFile(file);
             
-            PrintWriter writer = new PrintWriter( file, "UTF-8" );
+            writer = new PrintWriter( file, "UTF-8" );
             
             generateTextReport(writer);
-            
-            writer.close();
         } catch (IOException e) {
             throw new MojoExecutionException("Failure while creating new file " + file, e);
+        } finally {
+            if (writer != null) {
+                writer.close();            
+            }
         }
 	}
 
