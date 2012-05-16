@@ -131,17 +131,20 @@ public class LicensingReport {
 
 	public void writeTextReport(File file) throws MojoExecutionException {
 	    PrintWriter writer = null;
+        String lineSep = System.getProperty( "line.separator" );
+        System.setProperty( "line.separator", "\r\n" );
         try {
             FileUtil.createNewFile(file);
             
             writer = new PrintWriter( file, "UTF-8" );
             
-            generateTextReport(writer);
+            generateTextReport(writer);            
         } catch (IOException e) {
             throw new MojoExecutionException("Failure while creating new file " + file, e);
         } finally {
             if (writer != null) {
                 writer.close();            
+                System.setProperty( "line.separator", lineSep );
             }
         }
 	}
