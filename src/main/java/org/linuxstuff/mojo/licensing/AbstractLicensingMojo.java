@@ -41,7 +41,7 @@ abstract public class AbstractLicensingMojo extends AbstractMojo implements Mave
 	 * @readonly
 	 * @since 1.0
 	 */
-	private ResourceManager locator;
+	protected ResourceManager locator;
 
 	/**
 	 * Local Repository.

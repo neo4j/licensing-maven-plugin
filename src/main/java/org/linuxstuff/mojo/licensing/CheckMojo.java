@@ -7,6 +7,8 @@ import java.util.Set;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.resource.loader.FileResourceCreationException;
+import org.codehaus.plexus.resource.loader.ResourceNotFoundException;
 import org.linuxstuff.mojo.licensing.model.ArtifactWithLicenses;
 import org.linuxstuff.mojo.licensing.model.LicensingReport;
 
@@ -58,6 +60,22 @@ public class CheckMojo extends AbstractLicensingMojo {
     protected boolean plainTextReport;
 
     /**
+     * File to prepend to the text-based report.
+     * 
+     * @parameter expression="${prependText}"
+     * @since 1.0
+     */
+    protected String prependText;
+
+    /**
+     * File to append to the text-based report.
+     * 
+     * @parameter expression="${appendText}"
+     * @since 1.0
+     */
+    protected String appendText;
+
+    /**
 	 * Fail the build if any dependencies are either under disliked licenses or
 	 * are missing licensing information.
 	 */
@@ -76,7 +94,9 @@ public class CheckMojo extends AbstractLicensingMojo {
 		File file = new File(project.getBuild().getDirectory(), thirdPartyLicensingFilename);
 
 		if (plainTextReport) {
-	        report.writeTextReport(file);
+		    File prefixResource = getTextResourceFile(prependText);
+            File postfixResource = getTextResourceFile(appendText);
+	        report.writeTextReport(file, prefixResource, postfixResource);
 		} else {
 		    report.writeReport(file);
 		}
@@ -84,6 +104,27 @@ public class CheckMojo extends AbstractLicensingMojo {
 		checkForFailure(report);
 
 	}
+
+    private File getTextResourceFile( String fileName ) throws MojoExecutionException
+    {
+        if (fileName == null || "".equals(fileName)) {
+            return null;
+        }
+        File textResource;
+        try
+        {
+            textResource = locator.getResourceAsFile(fileName);
+        }
+        catch ( ResourceNotFoundException e )
+        {
+            throw new MojoExecutionException("File not found" , e );
+        }
+        catch ( FileResourceCreationException e )
+        {
+            throw new MojoExecutionException("Could not create file resource." , e );
+        }
+        return textResource;
+    }
 
 	protected LicensingReport generateReport(MavenProject project) {
 

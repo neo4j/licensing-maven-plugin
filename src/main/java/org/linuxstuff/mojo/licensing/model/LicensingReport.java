@@ -13,6 +13,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.codehaus.plexus.util.FileUtils;
 import org.linuxstuff.mojo.licensing.FileUtil;
 
 import com.thoughtworks.xstream.XStream;
@@ -23,7 +24,9 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 @XStreamAlias("licensing")
 public class LicensingReport {
 
-	@XStreamAlias("disliked-licenses")
+	private static final String FILE_ENCODING = "UTF-8";
+
+    @XStreamAlias("disliked-licenses")
 	@XStreamAsAttribute
 	long dislikedArtifactsCount;
 
@@ -129,16 +132,18 @@ public class LicensingReport {
         }
 	}
 
-	public void writeTextReport(File file) throws MojoExecutionException {
+	public void writeTextReport(File file, File prefix, File postfix) throws MojoExecutionException {
 	    PrintWriter writer = null;
         String lineSep = System.getProperty( "line.separator" );
-        System.setProperty( "line.separator", "\r\n" );
+        System.setProperty( "line.separator", "\r\n" );        
         try {
             FileUtil.createNewFile(file);
             
-            writer = new PrintWriter( file, "UTF-8" );
+            writer = new PrintWriter( file, FILE_ENCODING );
             
+            writeToFile( prefix, writer );
             generateTextReport(writer);            
+            writeToFile( postfix, writer );           
         } catch (IOException e) {
             throw new MojoExecutionException("Failure while creating new file " + file, e);
         } finally {
@@ -148,6 +153,19 @@ public class LicensingReport {
             }
         }
 	}
+
+    private void writeToFile( File fromFile, PrintWriter writer )
+            throws IOException
+    {
+        if (fromFile  != null)
+        {
+            String[] lines = FileUtils.fileRead( fromFile, FILE_ENCODING ).split( "\n" );
+            for (String line : lines) {
+                writer.println( line );
+            }
+            writer.println();
+        }
+    }
 
     private void generateTextReport(PrintWriter writer) throws IOException
     {
