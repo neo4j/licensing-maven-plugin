@@ -13,6 +13,9 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.codehaus.plexus.resource.ResourceManager;
+import org.codehaus.plexus.resource.loader.FileResourceCreationException;
+import org.codehaus.plexus.resource.loader.ResourceNotFoundException;
 import org.codehaus.plexus.util.FileUtils;
 import org.linuxstuff.mojo.licensing.FileUtil;
 
@@ -24,7 +27,9 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 @XStreamAlias("licensing")
 public class LicensingReport {
 
-	private static final String FILE_ENCODING = "UTF-8";
+	private static final String LINE = "------------------------------------------------------------------------------";
+
+    private static final String FILE_ENCODING = "UTF-8";
 
     @XStreamAlias("disliked-licenses")
 	@XStreamAsAttribute
@@ -51,7 +56,6 @@ public class LicensingReport {
 	}
 
 	private void updatePassing() {
-
 		passing = (licenseMissing.isEmpty() && dislikedArtifacts.isEmpty());
 	}
 
@@ -132,18 +136,23 @@ public class LicensingReport {
         }
 	}
 
-	public void writeTextReport(File file, File prefix, File postfix) throws MojoExecutionException {
+    public void writeTextReport( File file, ResourceManager locator,
+            String prependText, String appendText, boolean includeDualList,
+            boolean includeFullLicense ) throws MojoExecutionException
+    {
 	    PrintWriter writer = null;
         String lineSep = System.getProperty( "line.separator" );
         System.setProperty( "line.separator", "\r\n" );        
         try {
+            File prefixResource = getTextResourceFile(locator, prependText);
+            File postfixResource = getTextResourceFile(locator, appendText);
             FileUtil.createNewFile(file);
             
             writer = new PrintWriter( file, FILE_ENCODING );
             
-            writeToFile( prefix, writer );
-            generateTextReport(writer);            
-            writeToFile( postfix, writer );           
+            writeToFile( prefixResource, writer );
+            generateTextReport(writer, locator, includeDualList, includeFullLicense);
+            writeToFile( postfixResource, writer );
         } catch (IOException e) {
             throw new MojoExecutionException("Failure while creating new file " + file, e);
         } finally {
@@ -153,6 +162,27 @@ public class LicensingReport {
             }
         }
 	}
+
+    private File getTextResourceFile( ResourceManager locator, String fileName ) throws MojoExecutionException
+    {
+        if (fileName == null || "".equals(fileName)) {
+            return null;
+        }
+        File textResource;
+        try
+        {
+            textResource = locator.getResourceAsFile(fileName);
+        }
+        catch ( ResourceNotFoundException e )
+        {
+            throw new MojoExecutionException("File not found" , e );
+        }
+        catch ( FileResourceCreationException e )
+        {
+            throw new MojoExecutionException("Could not create file resource." , e );
+        }
+        return textResource;
+    }
 
     private void writeToFile( File fromFile, PrintWriter writer )
             throws IOException
@@ -167,7 +197,9 @@ public class LicensingReport {
         }
     }
 
-    private void generateTextReport(PrintWriter writer) throws IOException
+    private void generateTextReport( PrintWriter writer,
+            ResourceManager locator, boolean includeDualList, boolean includeFullLicense )
+            throws IOException, MojoExecutionException
     {
         SortedMap<String,SortedSet<String>> artifactsPerLicense = new TreeMap<String,SortedSet<String>>();
         SortedMap<String,SortedSet<String>> multiLicensed = new TreeMap<String,SortedSet<String>>();
@@ -191,19 +223,35 @@ public class LicensingReport {
 	            }
 	        }
         }
-	    writer.println( "Third-party licenses" );
-        writer.println( "====================" );
+	    if (!includeFullLicense)
+	    {
+	        writer.println( "Third-party licenses" );
+            writer.println( "--------------------" );
+	    }
 	    for ( Entry<String,SortedSet<String>> entry : artifactsPerLicense.entrySet()) {
-	        writer.println();
+	        if (includeFullLicense)
+	        {
+                writer.println( LINE );
+	        }
+	        else
+	        {
+	            writer.println();
+	        }
 	        writer.println(entry.getKey());
 	        for (String artifactName : entry.getValue()) {
 	            writer.println("  " + artifactName);
+	        }
+	        if (includeFullLicense)
+	        {
+	            writer.println( LINE + "\n" );
+	            writeToFile(getTextResourceFile( locator, entry.getKey() ), writer);
+	            writer.println();
 	        }
 	    }
         writer.println();
 	    if (multiLicensed.size() > 0) {
 	        writer.println("Dependencies with multiple licenses");
-            writer.println("===================================");
+            writer.println("-----------------------------------");
             for ( Entry<String,SortedSet<String>> entry : multiLicensed.entrySet()) {
                 writer.println();
                 writer.println(entry.getKey());
