@@ -280,6 +280,43 @@ abstract public class AbstractLicensingMojo extends AbstractMojo implements Mave
 		return true;
 	}
 
+    /**
+     * As long as the {@code MavenProject} is under at least one liked license,
+     * then it is liked. This method will also consider licensing specified in
+     * licensing requirements; but only if the {@code MavenProject} does not
+     * have its own {@code License} block. If no licensing at all is found then
+     * it is considered disliked.
+     */
+    protected boolean isDisliked(ArtifactWithLicenses artifactWithLicenses) {
+
+        if (!licensingRequirements.containsDislikedLicenses()
+                && !licensingRequirements.containsLikedLicenses()) {
+            return false;
+        }
+
+        if (licensingRequirements.isExemptFromDislike(artifactWithLicenses.getArtifactId())) {
+            return false;
+        }
+
+        Set<String> licenses = artifactWithLicenses.getLicenses();
+
+        if (licensingRequirements.containsLikedLicenses()) {
+            for (String license : licenses) {
+
+                if (licensingRequirements.isLikedLicense(license))
+                    return false;
+            }
+            return true;
+        }
+        for (String license : licenses) {
+
+            if (!licensingRequirements.isDislikedLicense(license))
+                return false;
+        }
+
+        return true;
+    }
+
 	protected boolean hasLicense(MavenProject mavenProject) {
 		return !collectLicensesForMavenProject(mavenProject).isEmpty();
 	}

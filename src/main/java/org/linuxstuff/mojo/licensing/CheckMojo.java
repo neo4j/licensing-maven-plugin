@@ -141,7 +141,7 @@ public class CheckMojo extends AbstractLicensingMojo {
 			Set<String> licenses = collectLicensesForMavenProject(mavenProject);
 
 			if (licenses.isEmpty()) {
-				getLog().warn("Licensing: The artifact " + mavenProject.getId() + " has no license specified.");
+				getLog().warn("Licensing: The artifact " + entry.getArtifactId() + " has no license specified.");
 				aReport.addMissingLicense(entry);
 			} else {
 				for (String license : licenses) {
@@ -156,14 +156,46 @@ public class CheckMojo extends AbstractLicensingMojo {
 				}
 
 				if (isDisliked(mavenProject)) {
-					getLog().warn("Licensing: The artifact " + mavenProject.getId() + " is only under a disliked license.");
+					getLog().warn("Licensing: The artifact " + entry.getArtifactId() + " is only under a disliked license.");
 					aReport.addDislikedArtifact(entry);
 				} else {
 					aReport.addLicensedArtifact(entry);
 				}
-
 			}
+		}
+		
+		for (ArtifactWithLicenses artifactWithLicenses : licensingRequirements.getMissingArtifacts()) {
+            ArtifactWithLicenses entry = new ArtifactWithLicenses(
+                    artifactWithLicenses.getArtifactId(),
+                    artifactWithLicenses.getName() );
+            Set<String> licenses = artifactWithLicenses.getLicenses();
 
+            if (licenses.isEmpty()) {
+                getLog().warn("Licensing: The artifact " + entry.getArtifactId() + " has no license specified.");
+                aReport.addMissingLicense(entry);
+            } else {
+                for (String license : licenses) {
+                    String correct = licensingRequirements.getCorrectLicenseName( license );
+                    if (includeOnlyLikedInReport && licensingRequirements.containsLikedLicenses()) {
+                        if (licensingRequirements.isLikedLicense( correct )) {
+                            entry.addLicense(correct);
+                        }
+                    }
+                    else {
+                        entry.addLicense(correct);
+                    }
+                }
+
+                if (isDisliked(entry)) {
+                    getLog().warn(
+                            "Licensing: The artifact " + entry.getArtifactId()
+                                    + " is only under disliked licenses: "
+                                    + licenses );
+                    aReport.addDislikedArtifact(entry);
+                } else {
+                    aReport.addLicensedArtifact(entry);
+                }
+            }
 		}
 
 		return aReport;

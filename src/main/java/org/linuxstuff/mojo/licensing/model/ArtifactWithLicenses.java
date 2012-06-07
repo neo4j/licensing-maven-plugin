@@ -34,6 +34,12 @@ public class ArtifactWithLicenses {
 		this.artifactId = artifactId;
 		this.licenses = licenses;
 	}
+	
+	public ArtifactWithLicenses(String artifactId, String name) {
+        licenses = new HashSet<String>();
+        this.artifactId = artifactId;
+        this.name = name;
+	}
 
 	public void combineWith(ArtifactWithLicenses other) {
 		licenses.addAll(other.getLicenses());
@@ -58,7 +64,7 @@ public class ArtifactWithLicenses {
 	public void setLicenses(Set<String> licenses) {
 		this.licenses = licenses;
 	}
-
+	
 	public String getName() {
 		return name;
 	}

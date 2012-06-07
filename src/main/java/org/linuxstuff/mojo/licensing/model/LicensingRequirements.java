@@ -12,6 +12,9 @@ public class LicensingRequirements {
 	@XStreamAlias("missing-licenses")
 	private Set<ArtifactWithLicenses> missingLicenses = new HashSet<ArtifactWithLicenses>();
 
+    @XStreamAlias("missing-artifacts")
+    private Set<ArtifactWithLicenses> missingArtifacts = new HashSet<ArtifactWithLicenses>();
+
 	@XStreamAlias("coalesced-licenses")
 	private Set<CoalescedLicense> coalescedLicenses = new HashSet<CoalescedLicense>();
 
@@ -29,6 +32,10 @@ public class LicensingRequirements {
 
 	public void addArtifactMissingLicense(ArtifactWithLicenses missingLicense) {
 		missingLicenses.add(missingLicense);
+	}
+	
+	public void addMissingArtifact(ArtifactWithLicenses missingArtifact) {
+	    missingArtifacts.add(missingArtifact);
 	}
 
 	public void addCoalescedLicense(CoalescedLicense coalescedLicense) {
@@ -99,6 +106,10 @@ public class LicensingRequirements {
 		return missingLicenses;
 	}
 
+    public Set<ArtifactWithLicenses> getMissingArtifacts() {
+        return missingArtifacts;
+    }
+
 	public Set<CoalescedLicense> getCoalescedLicenses() {
 		return coalescedLicenses;
 	}
@@ -147,6 +158,20 @@ public class LicensingRequirements {
 					addArtifactMissingLicense(source);
 				}
 			}
+		}
+		
+		if (req.getMissingArtifacts() != null) {
+		    for (ArtifactWithLicenses source : req.getMissingArtifacts()) {
+		        if (getMissingArtifacts().contains(source)) {
+		            for (ArtifactWithLicenses destination : getMissingArtifacts()) {
+		                if (source.equals( destination )) {
+		                    destination.combineWith(source);
+		                }
+		            }
+		        } else {
+		            addMissingArtifact(source);
+		        }
+		    }
 		}
 
 		if (req.getCoalescedLicenses() != null) {
