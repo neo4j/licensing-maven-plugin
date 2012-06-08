@@ -61,11 +61,19 @@ public class CheckMojo extends AbstractLicensingMojo {
     protected boolean plainTextReport;
 
     /**
-     * The name of the the txt file which contains full text licenses.
+     * The name of the  output txt file which contains full text licenses.
+     * Only kicks in as part of generating a plain text report.
      * 
-     * @parameter expression="${thirdPartyLicenseListFilename}"
+     * @parameter expression="${listReport}"
      */
-    protected String thirdPartyLicenseListFilename;
+    protected String listReport;
+
+    /**
+     * File to prepend to the text-based report with full license texts.
+     * 
+     * @parameter expression="${listPrependText}"
+     */
+    protected String listPrependText;
 
     /**
      * File to prepend to the text-based report.
@@ -102,7 +110,11 @@ public class CheckMojo extends AbstractLicensingMojo {
 		File file = new File(project.getBuild().getDirectory(), thirdPartyLicensingFilename);
 
 		if (plainTextReport) {
-	        report.writeTextReport(file, locator, prependText, appendText, true, true);
+	        report.writeTextReport(file, locator, prependText, appendText, true, false);
+	        if (listReport != null) {
+	            file = new File(project.getBuild().getDirectory(), listReport);
+	            report.writeTextReport(file, locator, listPrependText, null, false, true);
+	        }
 		} else {
 		    report.writeReport(file);
 		}
@@ -141,7 +153,9 @@ public class CheckMojo extends AbstractLicensingMojo {
 				}
 
 				if (isDisliked(mavenProject)) {
-					getLog().warn("Licensing: The artifact " + entry.getArtifactId() + " is only under a disliked license.");
+                    getLog().warn(
+                            "Licensing: The artifact " + entry.getArtifactId()
+                                    + " is only under disliked licenses: " + licenses );
 					aReport.addDislikedArtifact(entry);
 				} else {
 					aReport.addLicensedArtifact(entry);

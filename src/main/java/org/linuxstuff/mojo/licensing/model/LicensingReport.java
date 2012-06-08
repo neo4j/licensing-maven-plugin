@@ -209,14 +209,14 @@ public class LicensingReport {
 	        for (String license : licenses) {
 	            SortedSet<String> artifacts = artifactsPerLicense.get( license );
 	            if (artifacts == null) {
-	                artifacts = new TreeSet<String>();
+	                artifacts = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
 	                artifactsPerLicense.put( license, artifacts );
 	            }
 	            artifacts.add( artifactName );
 	            if (licenses.size() > 1) {
 	                SortedSet<String> artifactLicenses = multiLicensed.get( artifactName );
 	                if (artifactLicenses==null) {
-	                    artifactLicenses = new TreeSet<String>();
+	                    artifactLicenses = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
 	                    multiLicensed.put( artifactName, artifactLicenses );
 	                }
 	                artifactLicenses.add( license );	                
