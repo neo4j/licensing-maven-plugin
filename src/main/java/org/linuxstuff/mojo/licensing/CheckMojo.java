@@ -158,6 +158,7 @@ public class CheckMojo extends AbstractLicensingMojo {
                                     + " is only under disliked licenses: " + licenses );
 					aReport.addDislikedArtifact(entry);
 				} else {
+				    licensingRequirements.normalizeLicenses( entry );
 					aReport.addLicensedArtifact(entry);
 				}
 			}
@@ -192,6 +193,7 @@ public class CheckMojo extends AbstractLicensingMojo {
                                     + licenses );
                     aReport.addDislikedArtifact(entry);
                 } else {
+                    licensingRequirements.normalizeLicenses( entry );
                     aReport.addLicensedArtifact(entry);
                 }
             }

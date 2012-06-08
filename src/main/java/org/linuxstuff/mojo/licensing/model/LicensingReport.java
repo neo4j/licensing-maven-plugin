@@ -59,7 +59,7 @@ public class LicensingReport {
 		passing = (licenseMissing.isEmpty() && dislikedArtifacts.isEmpty());
 	}
 
-	public void addLicensedArtifact(ArtifactWithLicenses artifact) {
+	public void addLicensedArtifact(ArtifactWithLicenses artifact) {	    
 		licensedArtifacts.add(artifact);
 	}
 

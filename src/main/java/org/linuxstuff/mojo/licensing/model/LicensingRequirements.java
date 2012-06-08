@@ -18,6 +18,9 @@ public class LicensingRequirements {
 	@XStreamAlias("coalesced-licenses")
 	private Set<CoalescedLicense> coalescedLicenses = new HashSet<CoalescedLicense>();
 
+    @XStreamAlias("dual-licenses")
+    private Set<DualLicense> dualLicenses = new HashSet<DualLicense>();
+
 	@XStreamAlias("disliked-licenses")
 	@XStreamImplicit(itemFieldName = "disliked-license")
 	private Set<String> dislikedLicenses = new HashSet<String>();
@@ -40,6 +43,10 @@ public class LicensingRequirements {
 
 	public void addCoalescedLicense(CoalescedLicense coalescedLicense) {
 		coalescedLicenses.add(coalescedLicense);
+	}
+	
+	public void addDualLicense(DualLicense dualLicense) {
+	    dualLicenses.add( dualLicense );
 	}
 
 	public void addDislikedLicense(String licenseName) {
@@ -73,6 +80,37 @@ public class LicensingRequirements {
 		}
 
 		return name;
+	}
+	
+	/**
+	 * Coalesce license names and split dual licenses.
+	 * @param artifact
+	 */
+	public void normalizeLicenses(ArtifactWithLicenses artifact) {
+	    Set<String> normalizedLicenses = new HashSet<String>();
+	    for (String license: artifact.getLicenses())
+	    {
+	        String correct = getCorrectLicenseName( license );
+	        boolean found = false;
+            for (DualLicense dualLicense : getDualLicenses())
+            {
+                if (correct.equals(dualLicense.getFinalName()))
+                {
+                    for (String option : dualLicense.getOptionalLicenses())
+                    {
+                        System.out.println("Adding option: " + option);
+                        normalizedLicenses.add( option );
+                    }
+                    found = true;
+                    continue;
+                }
+            }
+            if (!found)
+	        {
+	            normalizedLicenses.add( correct );
+	        }
+	    }
+	    artifact.setLicenses( normalizedLicenses );
 	}
 
 	public boolean isExemptFromDislike(String artifactId) {
@@ -112,6 +150,10 @@ public class LicensingRequirements {
 
 	public Set<CoalescedLicense> getCoalescedLicenses() {
 		return coalescedLicenses;
+	}
+	
+	public Set<DualLicense> getDualLicenses() {
+	    return dualLicenses;
 	}
 
 	public Set<String> getDislikedLicenses() {
@@ -188,6 +230,22 @@ public class LicensingRequirements {
 				}
 			}
 		}
+
+
+        if (req.getDualLicenses() != null) {
+
+            for (DualLicense source : req.getDualLicenses()) {
+                if (getDualLicenses().contains(source)) {
+                    for (DualLicense destination : getDualLicenses()) {
+                        if (source.equals(destination)) {
+                            destination.combineWith(source);
+                        }
+                    }
+                } else {
+                    addDualLicense(source);
+                }
+            }
+        }
 	}
 
 }
