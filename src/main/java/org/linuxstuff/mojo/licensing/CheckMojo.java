@@ -7,9 +7,6 @@ import java.util.Set;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.resource.ResourceManager;
-import org.codehaus.plexus.resource.loader.FileResourceCreationException;
-import org.codehaus.plexus.resource.loader.ResourceNotFoundException;
 import org.linuxstuff.mojo.licensing.model.ArtifactWithLicenses;
 import org.linuxstuff.mojo.licensing.model.LicensingReport;
 

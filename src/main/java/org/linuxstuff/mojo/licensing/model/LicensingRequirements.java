@@ -98,7 +98,6 @@ public class LicensingRequirements {
                 {
                     for (String option : dualLicense.getOptionalLicenses())
                     {
-                        System.out.println("Adding option: " + option);
                         normalizedLicenses.add( option );
                     }
                     found = true;
