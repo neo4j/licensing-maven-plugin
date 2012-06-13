@@ -141,8 +141,8 @@ public class LicensingReport {
             boolean includeFullLicense ) throws MojoExecutionException
     {
 	    PrintWriter writer = null;
-        String lineSep = System.getProperty( "line.separator" );
-        System.setProperty( "line.separator", "\r\n" );        
+//        String lineSep = System.getProperty( "line.separator" );
+//        System.setProperty( "line.separator", "\r\n" );        
         try {
             File prefixResource = getTextResourceFile(locator, prependText);
             File postfixResource = getTextResourceFile(locator, appendText);
@@ -158,7 +158,7 @@ public class LicensingReport {
         } finally {
             if (writer != null) {
                 writer.close();            
-                System.setProperty( "line.separator", lineSep );
+//                System.setProperty( "line.separator", lineSep );
             }
         }
 	}
