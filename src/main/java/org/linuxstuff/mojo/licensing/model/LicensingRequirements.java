@@ -12,6 +12,9 @@ public class LicensingRequirements {
 	@XStreamAlias("missing-licenses")
 	private Set<ArtifactWithLicenses> missingLicenses = new HashSet<ArtifactWithLicenses>();
 
+    @XStreamAlias("override-licenses")
+    private Set<ArtifactWithLicenses> overrideLicenses = new HashSet<ArtifactWithLicenses>();
+	
     @XStreamAlias("missing-artifacts")
     private Set<ArtifactWithLicenses> missingArtifacts = new HashSet<ArtifactWithLicenses>();
 
@@ -35,6 +38,10 @@ public class LicensingRequirements {
 
 	public void addArtifactMissingLicense(ArtifactWithLicenses missingLicense) {
 		missingLicenses.add(missingLicense);
+	}
+	
+	public void addOverrideLicense(ArtifactWithLicenses overrideLicense) {
+	    overrideLicenses.add( overrideLicense );
 	}
 	
 	public void addMissingArtifact(ArtifactWithLicenses missingArtifact) {
@@ -83,10 +90,18 @@ public class LicensingRequirements {
 	}
 	
 	/**
-	 * Coalesce license names and split dual licenses.
+	 * Coalesce license names and split dual licenses, replace override licenses.
 	 * @param artifact
 	 */
 	public void normalizeLicenses(ArtifactWithLicenses artifact) {
+	    String id = artifact.getArtifactId();
+	    for (ArtifactWithLicenses replacement : overrideLicenses) {
+	        // check only start of id, so the version can be left out
+	        if (id.startsWith( replacement.getArtifactId())) {
+	            artifact.setLicenses( replacement.getLicenses() );
+	            break;
+	        }
+	    }
 	    Set<String> normalizedLicenses = new HashSet<String>();
 	    for (String license: artifact.getLicenses())
 	    {
@@ -142,6 +157,10 @@ public class LicensingRequirements {
 	public Set<ArtifactWithLicenses> getMissingLicenses() {
 		return missingLicenses;
 	}
+	
+	public Set<ArtifactWithLicenses> getOverrideLicenses() {
+	    return overrideLicenses;
+	}
 
     public Set<ArtifactWithLicenses> getMissingArtifacts() {
         return missingArtifacts;
@@ -187,33 +206,9 @@ public class LicensingRequirements {
 			}
 		}
 
-		if (req.getMissingLicenses() != null) {
-			for (ArtifactWithLicenses source : req.getMissingLicenses()) {
-				if (getMissingLicenses().contains(source)) {
-					for (ArtifactWithLicenses destination : getMissingLicenses()) {
-						if (source.equals(destination)) {
-							destination.combineWith(source);
-						}
-					}
-				} else {
-					addArtifactMissingLicense(source);
-				}
-			}
-		}
-		
-		if (req.getMissingArtifacts() != null) {
-		    for (ArtifactWithLicenses source : req.getMissingArtifacts()) {
-		        if (getMissingArtifacts().contains(source)) {
-		            for (ArtifactWithLicenses destination : getMissingArtifacts()) {
-		                if (source.equals( destination )) {
-		                    destination.combineWith(source);
-		                }
-		            }
-		        } else {
-		            addMissingArtifact(source);
-		        }
-		    }
-		}
+        mergeArtifactsWithLicenses( req.getMissingLicenses(), getMissingLicenses() );
+        mergeArtifactsWithLicenses( req.getOverrideLicenses(), getOverrideLicenses() );
+		mergeArtifactsWithLicenses( req.getMissingArtifacts(), getMissingArtifacts() );
 
 		if (req.getCoalescedLicenses() != null) {
 
@@ -247,4 +242,22 @@ public class LicensingRequirements {
         }
 	}
 
+    private void mergeArtifactsWithLicenses(
+            Set<ArtifactWithLicenses> sourceArtifacts,
+            Set<ArtifactWithLicenses> destinationArtifacts )
+    {
+        if (sourceArtifacts != null) {
+		    for (ArtifactWithLicenses source : sourceArtifacts) {
+		        if (destinationArtifacts.contains(source)) {
+		            for (ArtifactWithLicenses destination : destinationArtifacts) {
+		                if (source.equals( destination )) {
+		                    destination.combineWith(source);
+		                }
+		            }
+		        } else {
+		            destinationArtifacts.add( source );
+		        }
+		    }
+		}
+    }
 }
