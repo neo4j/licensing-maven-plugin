@@ -1,12 +1,14 @@
 package org.linuxstuff.mojo.licensing;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.FileUtils;
 import org.linuxstuff.mojo.licensing.model.ArtifactWithLicenses;
 import org.linuxstuff.mojo.licensing.model.LicensingReport;
 
@@ -25,12 +27,12 @@ import org.linuxstuff.mojo.licensing.model.LicensingReport;
  */
 public class CheckMojo extends AbstractLicensingMojo {
 
-	/**
-	 * A fail the build if any artifacts are missing licensing information.
-	 * 
-	 * @parameter expression="${failIfMissing}" default-value="true"
-	 * @since 1.0
-	 */
+	    /**
+     * A fail the build if any artifacts are missing licensing information.
+     * 
+     * @parameter expression="${failIfMissing}" default-value="true"
+     * @since 1.7.3
+     */
 	protected boolean failIfMissing;
 
 	/**
@@ -41,19 +43,19 @@ public class CheckMojo extends AbstractLicensingMojo {
 	 */
 	protected boolean failIfDisliked;
 
-	/**
-	 * If using liked licenses, only use those in the report.
-	 * 
-	 * @parameter expression="${includeOnlyLikedInReport}" default-value="true"
-	 * @since 1.0
-	 */
+	    /**
+     * If using liked licenses, only use those in the report.
+     * 
+     * @parameter expression="${includeOnlyLikedInReport}" default-value="true"
+     * @since 1.7.3
+     */
 	protected boolean includeOnlyLikedInReport;
 
     /**
      * Output the result as a plain text file.
      * 
      * @parameter expression="${writeTextReport}" default-value="false"
-     * @since 1.0
+     * @since 1.7.3
      */
     protected boolean plainTextReport;
 
@@ -76,7 +78,7 @@ public class CheckMojo extends AbstractLicensingMojo {
      * File to prepend to the text-based report.
      * 
      * @parameter expression="${prependText}"
-     * @since 1.0
+     * @since 1.7.3
      */
     protected String prependText;
 
@@ -84,14 +86,30 @@ public class CheckMojo extends AbstractLicensingMojo {
      * File to append to the text-based report.
      * 
      * @parameter expression="${appendText}"
-     * @since 1.0
+     * @since 1.7.3
      */
     protected String appendText;
 
     /**
-	 * Fail the build if any dependencies are either under disliked licenses or
-	 * are missing licensing information.
-	 */
+     * File to append to the text-based report.
+     * 
+     * @parameter expression="${checkExistingNoticeFile}"
+     * @since 1.7.4
+     */
+    protected String checkExistingNoticeFile;
+
+    /**
+     * File to append to the text-based report.
+     * 
+     * @parameter expression="${checkExistingLicensesFile}"
+     * @since 1.7.4
+     */
+    protected String checkExistingLicensesFile;
+
+    /**
+     * Fail the build if any dependencies are either under disliked licenses or
+     * are missing licensing information.
+     */
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
@@ -107,10 +125,14 @@ public class CheckMojo extends AbstractLicensingMojo {
 		File file = new File(project.getBuild().getDirectory(), thirdPartyLicensingFilename);
 
 		if (plainTextReport) {
+            // notice file
 	        report.writeTextReport(file, locator, prependText, appendText, true, false);
+            compareToExistingFile( file, checkExistingNoticeFile );
 	        if (listReport != null) {
+                // licenses file
 	            file = new File(project.getBuild().getDirectory(), listReport);
 	            report.writeTextReport(file, locator, listPrependText, null, false, true);
+                compareToExistingFile( file, checkExistingLicensesFile );
 	        }
 		} else {
 		    report.writeReport(file);
@@ -119,6 +141,34 @@ public class CheckMojo extends AbstractLicensingMojo {
 		checkForFailure(report);
 
 	}
+
+    private void compareToExistingFile( File file, String existingFileName )
+            throws MojoExecutionException
+    {
+        if ( existingFileName != null )
+        {
+            File existingFile = FileUtils.getFile( existingFileName );
+            try
+            {
+                if ( !FileUtils.contentEquals( file, existingFile ) )
+                {
+                    throw new MojoExecutionException(
+                            "Generated file differs from the existing file.\n"
+                                    + "Generated: " + file + "\n"
+                                    + "Existing: " + existingFile );
+                }
+                else
+                {
+                    getLog().info( "File confirmed: " + existingFileName );
+                }
+            }
+            catch ( IOException ioe )
+            {
+                throw new MojoExecutionException(
+                        "Could not compare files.", ioe );
+            }
+        }
+    }
 
 	protected LicensingReport generateReport(MavenProject project) {
 

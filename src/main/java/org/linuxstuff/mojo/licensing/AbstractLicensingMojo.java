@@ -216,7 +216,7 @@ abstract public class AbstractLicensingMojo extends AbstractMojo implements Mave
 		for (String requirementsFile : licensingRequirementFiles) {
 
 			try {
-				requirements.add((LicensingRequirements) xstream.fromXML(locator.getResourceAsInputStream(requirementsFile)));
+                requirements.add( (LicensingRequirements) xstream.fromXML( locator.getResourceAsInputStream( requirementsFile ) ) );
 
 			} catch (Exception e) {
 				throw new MojoExecutionException("Could not read licensing requirements file: " + requirementsFile, e);
