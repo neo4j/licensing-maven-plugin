@@ -252,18 +252,39 @@ abstract public class AbstractLicensingMojo extends AbstractMojo implements Mave
 	 */
 	protected boolean isDisliked(MavenProject mavenProject) {
 
+        if ( !isDislikable( mavenProject.getId() ) )
+        {
+            return false;
+        }
+
+        Set<String> licenses = collectLicensesForMavenProject( mavenProject );
+
+        return checkDisliked( licenses );
+    }
+
+    /**
+     * Check if an artifact is dislikable.
+     */
+    private boolean isDislikable( String id )
+    {
+        boolean dislikable = true;
 		if (!licensingRequirements.containsDislikedLicenses()
 				&& !licensingRequirements.containsLikedLicenses()) {
-			return false;
+            dislikable = false;
 		}
 
-		if (licensingRequirements.isExemptFromDislike(mavenProject.getId())) {
-			return false;
+        if (licensingRequirements.isExemptFromDislike(id)) {
+            dislikable = false;
 		}
+        return dislikable;
+    }
 
-		Set<String> licenses = collectLicensesForMavenProject(mavenProject);
-
-		if (licensingRequirements.containsLikedLicenses()) {
+    /**
+     * Check if there's a disliked license.
+     */
+    private boolean checkDisliked( Set<String> licenses )
+    {
+        if (licensingRequirements.containsLikedLicenses()) {
 			for (String license : licenses) {
 
 				if (licensingRequirements.isLikedLicense(license))
@@ -278,7 +299,7 @@ abstract public class AbstractLicensingMojo extends AbstractMojo implements Mave
 		}
 
 		return true;
-	}
+    }
 
     /**
      * As long as the {@code MavenProject} is under at least one liked license,
@@ -289,32 +310,14 @@ abstract public class AbstractLicensingMojo extends AbstractMojo implements Mave
      */
     protected boolean isDisliked(ArtifactWithLicenses artifactWithLicenses) {
 
-        if (!licensingRequirements.containsDislikedLicenses()
-                && !licensingRequirements.containsLikedLicenses()) {
-            return false;
-        }
-
-        if (licensingRequirements.isExemptFromDislike(artifactWithLicenses.getArtifactId())) {
+        if ( !isDislikable( artifactWithLicenses.getArtifactId() ) )
+        {
             return false;
         }
 
         Set<String> licenses = artifactWithLicenses.getLicenses();
 
-        if (licensingRequirements.containsLikedLicenses()) {
-            for (String license : licenses) {
-
-                if (licensingRequirements.isLikedLicense(license))
-                    return false;
-            }
-            return true;
-        }
-        for (String license : licenses) {
-
-            if (!licensingRequirements.isDislikedLicense(license))
-                return false;
-        }
-
-        return true;
+        return checkDisliked( licenses );
     }
 
 	protected boolean hasLicense(MavenProject mavenProject) {

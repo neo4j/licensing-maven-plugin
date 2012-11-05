@@ -107,6 +107,14 @@ public class CheckMojo extends AbstractLicensingMojo {
     protected String checkExistingLicensesFile;
 
     /**
+     * Overwrite existing license/notice.txt files.
+     * 
+     * @parameter expression="${overwrite}" default-value="false"
+     * @since 1.7.5
+     */
+    protected boolean overwrite;
+
+    /**
      * Fail the build if any dependencies are either under disliked licenses or
      * are missing licensing information.
      */
@@ -152,10 +160,7 @@ public class CheckMojo extends AbstractLicensingMojo {
             {
                 if ( !FileUtils.contentEquals( file, existingFile ) )
                 {
-                    throw new MojoExecutionException(
-                            "Generated file differs from the existing file.\n"
-                                    + "Generated: " + file + "\n"
-                                    + "Existing: " + existingFile );
+                    generatedAndExistingDiffer( file, existingFile );
                 }
                 else
                 {
@@ -167,6 +172,33 @@ public class CheckMojo extends AbstractLicensingMojo {
                 throw new MojoExecutionException(
                         "Could not compare files.", ioe );
             }
+        }
+    }
+
+    protected void generatedAndExistingDiffer( File file, File existingFile )
+            throws MojoExecutionException
+    {
+        if ( overwrite )
+        {
+            try
+            {
+                getLog().info( "Replacing " + existingFile );
+                FileUtils.rename( file, existingFile );
+            }
+            catch ( IOException e )
+            {
+                throw new MojoExecutionException(
+                        "Could not overwrite the existing file.\n"
+                                + "Generated: " + file + "\n" + "Existing: "
+                                + existingFile );
+            }
+        }
+        else
+        {
+            throw new MojoExecutionException(
+                    "Generated file differs from the existing file.\n"
+                            + "Generated: " + file + "\n" + "Existing: "
+                            + existingFile );
         }
     }
 
@@ -199,13 +231,15 @@ public class CheckMojo extends AbstractLicensingMojo {
 					}
 				}
 
-				if (isDisliked(mavenProject)) {
+                licensingRequirements.normalizeLicenses( entry );
+
+                if ( isDisliked( entry ) )
+                {
                     getLog().warn(
                             "Licensing: The artifact " + entry.getArtifactId()
                                     + " is only under disliked licenses: " + licenses );
 					aReport.addDislikedArtifact(entry);
 				} else {
-				    licensingRequirements.normalizeLicenses( entry );
 					aReport.addLicensedArtifact(entry);
 				}
 			}
@@ -233,6 +267,8 @@ public class CheckMojo extends AbstractLicensingMojo {
                     }
                 }
 
+                licensingRequirements.normalizeLicenses( entry );
+
                 if (isDisliked(entry)) {
                     getLog().warn(
                             "Licensing: The artifact " + entry.getArtifactId()
@@ -240,7 +276,6 @@ public class CheckMojo extends AbstractLicensingMojo {
                                     + licenses );
                     aReport.addDislikedArtifact(entry);
                 } else {
-                    licensingRequirements.normalizeLicenses( entry );
                     aReport.addLicensedArtifact(entry);
                 }
             }
