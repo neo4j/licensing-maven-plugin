@@ -181,14 +181,14 @@ public class LicensingReport {
         return textResource;
     }
 
-    private void writeToFile( File fromFile, PrintWriter writer )
+    static void writeToFile( File fromFile, PrintWriter writer )
             throws IOException
     {
         if (fromFile  != null)
         {
-            String[] lines = FileUtils.fileRead( fromFile, FILE_ENCODING ).split( "\n" );
+            String[] lines = FileUtils.fileRead(fromFile, FILE_ENCODING).split("\r\n|\r|\n");
             for (String line : lines) {
-                writer.println( line );
+                writer.println(line);
             }
             writer.println();
         }
