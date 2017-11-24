@@ -1,16 +1,16 @@
 package org.linuxstuff.mojo.licensing;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProject;
+import org.linuxstuff.mojo.licensing.model.ArtifactWithLicenses;
+import org.linuxstuff.mojo.licensing.model.LicensingReport;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
-
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.FileUtils;
-import org.linuxstuff.mojo.licensing.model.ArtifactWithLicenses;
-import org.linuxstuff.mojo.licensing.model.LicensingReport;
 
 /**
  * Determine licensing information of all dependencies. This is generally
@@ -150,15 +150,14 @@ public class CheckMojo extends AbstractLicensingMojo {
 
 	}
 
-    private void compareToExistingFile( File file, String existingFileName )
-            throws MojoExecutionException
+    void compareToExistingFile( File file, String existingFileName ) throws MojoExecutionException
     {
         if ( existingFileName != null )
         {
             File existingFile = FileUtils.getFile( existingFileName );
             try
             {
-                if ( !FileUtils.contentEquals( file, existingFile ) )
+                if ( !FileUtils.contentEqualsIgnoreEOL( file, existingFile, null ) )
                 {
                     generatedAndExistingDiffer( file, existingFile );
                 }
@@ -183,7 +182,7 @@ public class CheckMojo extends AbstractLicensingMojo {
             try
             {
                 getLog().info( "Replacing " + existingFile );
-                FileUtils.rename( file, existingFile );
+                FileUtils.moveFile( file, existingFile );
             }
             catch ( IOException e )
             {

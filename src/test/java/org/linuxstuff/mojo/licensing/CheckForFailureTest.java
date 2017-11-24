@@ -1,11 +1,25 @@
 package org.linuxstuff.mojo.licensing;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.linuxstuff.mojo.licensing.model.ArtifactWithLicenses;
 import org.linuxstuff.mojo.licensing.model.LicensingReport;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+
 public class CheckForFailureTest {
+
+	@Rule
+	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	/**
 	 * Ignore all our problems.
@@ -120,4 +134,34 @@ public class CheckForFailureTest {
 		mojo.checkForFailure(report);
 	}
 
+	@Test
+	public void ignoreLicenseFilesEndOfLineCharactersDuringComparision()
+			throws MojoExecutionException, IOException
+	{
+		CheckMojo checkMojo = new CheckMojo();
+
+		List<String> fileLines = asList( "a", "b", "c" );
+		File windowsLicenseFile = generateTextFile( fileLines, "windows", IOUtils.LINE_SEPARATOR_WINDOWS );
+		File linuxLicenseFile = generateTextFile( fileLines, "linux", IOUtils.LINE_SEPARATOR_UNIX );
+
+		checkMojo.compareToExistingFile( windowsLicenseFile, linuxLicenseFile.getAbsolutePath() );
+	}
+
+	@Test( expected = MojoExecutionException.class )
+	public void detectDifferentLicenseFilesFromDifferentPlatforms() throws IOException, MojoExecutionException
+	{
+		CheckMojo checkMojo = new CheckMojo();
+
+		File windowsLicenseFile = generateTextFile( asList( "a", "b", "c" ), "windows", IOUtils.LINE_SEPARATOR_WINDOWS );
+		File linuxLicenseFile = generateTextFile( asList( "a", "c", "b" ), "linux", IOUtils.LINE_SEPARATOR_UNIX );
+
+		checkMojo.compareToExistingFile( windowsLicenseFile, linuxLicenseFile.getAbsolutePath() );
+	}
+
+	private File generateTextFile( List<String> fileLines, String fileName, String lineSeparator ) throws IOException
+	{
+		File windowsLicenseFile = temporaryFolder.newFile( fileName );
+		FileUtils.writeLines( windowsLicenseFile, fileLines, lineSeparator );
+		return windowsLicenseFile;
+	}
 }

@@ -1,9 +1,21 @@
 package org.linuxstuff.mojo.licensing.model;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.codehaus.plexus.resource.ResourceManager;
+import org.codehaus.plexus.resource.loader.FileResourceCreationException;
+import org.codehaus.plexus.resource.loader.ResourceNotFoundException;
+import org.codehaus.plexus.util.FileUtils;
+import org.linuxstuff.mojo.licensing.FileUtil;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -12,24 +24,12 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.maven.plugin.MojoExecutionException;
-import org.codehaus.plexus.resource.ResourceManager;
-import org.codehaus.plexus.resource.loader.FileResourceCreationException;
-import org.codehaus.plexus.resource.loader.ResourceNotFoundException;
-import org.codehaus.plexus.util.FileUtils;
-import org.linuxstuff.mojo.licensing.FileUtil;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.io.xml.StaxDriver;
-
 @XStreamAlias("licensing")
 public class LicensingReport {
 
 	private static final String LINE = "------------------------------------------------------------------------------";
 
-    private static final String FILE_ENCODING = "UTF-8";
+    public static final String FILE_ENCODING = StandardCharsets.UTF_8.name();
 
     @XStreamAlias("disliked-licenses")
 	@XStreamAsAttribute
