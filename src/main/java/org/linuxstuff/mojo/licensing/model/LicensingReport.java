@@ -29,9 +29,11 @@ public class LicensingReport {
 
 	private static final String LINE = "------------------------------------------------------------------------------";
 
+	private static final String LINE_SEPERATOR = System.getProperty("line.separator");
+
     public static final String FILE_ENCODING = StandardCharsets.UTF_8.name();
 
-    @XStreamAlias("disliked-licenses")
+	@XStreamAlias("disliked-licenses")
 	@XStreamAsAttribute
 	long dislikedArtifactsCount;
 
@@ -186,7 +188,7 @@ public class LicensingReport {
     {
         if (fromFile  != null)
         {
-            String[] lines = FileUtils.fileRead( fromFile, FILE_ENCODING ).split( "\n" );
+            String[] lines = FileUtils.fileRead( fromFile, FILE_ENCODING ).split( "\r\n|\r|\n" );
             for (String line : lines) {
                 writer.println( line );
             }
@@ -240,7 +242,7 @@ public class LicensingReport {
 	        }
 	        if (includeFullLicense)
 	        {
-	            writer.println( LINE + "\n" );
+	            writer.println( LINE + LINE_SEPERATOR );
 	            writeToFile(getTextResourceFile( locator, entry.getKey() ), writer);
 	            writer.println();
 	        }
