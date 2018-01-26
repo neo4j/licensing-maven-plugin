@@ -182,7 +182,7 @@ public class CheckMojo extends AbstractLicensingMojo {
             try
             {
                 getLog().info( "Replacing " + existingFile );
-                FileUtils.moveFile( file, existingFile );
+                org.codehaus.plexus.util.FileUtils.rename( file, existingFile );
             }
             catch ( IOException e )
             {

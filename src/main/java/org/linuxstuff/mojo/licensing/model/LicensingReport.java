@@ -186,10 +186,7 @@ public class LicensingReport {
     {
         if (fromFile  != null)
         {
-            String[] lines = FileUtils.fileRead( fromFile, FILE_ENCODING ).split( "\n" );
-            for (String line : lines) {
-                writer.println( line );
-            }
+			writer.println( FileUtils.fileRead( fromFile, FILE_ENCODING ) );
             writer.println();
         }
     }
