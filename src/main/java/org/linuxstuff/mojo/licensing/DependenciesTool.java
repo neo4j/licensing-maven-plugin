@@ -46,7 +46,7 @@ public interface DependenciesTool {
 	 * Result is given in a map where keys are unique artifact id
 	 * 
 	 * @param project
-	 *            the project to scann
+	 *            the project to scan
 	 * @param configuration
 	 *            the configuration
 	 * @param localRepository
