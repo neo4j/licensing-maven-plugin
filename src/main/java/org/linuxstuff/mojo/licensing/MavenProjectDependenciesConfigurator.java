@@ -56,7 +56,7 @@ public interface MavenProjectDependenciesConfigurator {
 	List<String> getExcludedScopes();
 
 	/**
-	 * @return a pattern to include dependencies by thier {@code artificatId},
+	 * @return a pattern to include dependencies by their {@code artificatId},
 	 *         if {@code null} is set then include all artifacts.
 	 */
 	String getIncludedArtifacts();
