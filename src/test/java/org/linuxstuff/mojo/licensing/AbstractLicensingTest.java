@@ -34,7 +34,7 @@ public abstract class AbstractLicensingTest {
 
 		mavenProject = new MavenProject();
 		Model model = mavenProject.getModel();
-		model.setGroupId("groupdId");
+		model.setGroupId("groupId");
 		model.setArtifactId("artifactId");
 		model.setVersion("1.0");
 		model.setPackaging("jar");
