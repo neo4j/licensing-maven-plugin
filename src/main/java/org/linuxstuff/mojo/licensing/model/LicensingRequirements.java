@@ -1,10 +1,10 @@
 package org.linuxstuff.mojo.licensing.model;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @XStreamAlias("licensing-requirements")
 public class LicensingRequirements {
@@ -78,11 +78,13 @@ public class LicensingRequirements {
 	
 	public String getCorrectLicenseName(String name) {
 		for (CoalescedLicense coalesced : coalescedLicenses) {
-			if (coalesced.getFinalName().equalsIgnoreCase(name.trim()))
-				return name;
+			if (coalesced.getFinalName().equalsIgnoreCase(name.trim())) {
+				return coalesced.getFinalName();
+			}
 			for (String otherName : coalesced.getOtherNames()) {
-				if (otherName.equalsIgnoreCase(name.trim()))
+				if (otherName.equalsIgnoreCase(name.trim())) {
 					return coalesced.getFinalName();
+				}
 			}
 		}
 
