@@ -16,6 +16,10 @@ public class CoalescedLicense {
 	@XStreamImplicit(itemFieldName = "aka")
 	private Set<String> otherNames;
 
+	public CoalescedLicense() {
+		/* Hello XStream */
+	}
+
 	public CoalescedLicense(String finalName, Set<String> otherNames) {
 		this.finalName = finalName;
 		this.otherNames = otherNames;

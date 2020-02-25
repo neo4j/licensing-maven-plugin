@@ -16,6 +16,10 @@ public class DualLicense {
 	@XStreamImplicit(itemFieldName = "option")
 	private Set<String> optionalLicenses;
 
+	public DualLicense() {
+		/* Hello XStream */
+	}
+
 	public DualLicense(String finalName, Set<String> optionalLicenses) {
 		this.finalName = finalName;
 		this.optionalLicenses = optionalLicenses;
