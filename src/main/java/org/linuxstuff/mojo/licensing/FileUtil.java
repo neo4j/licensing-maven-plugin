@@ -40,7 +40,7 @@ public class FileUtil {
 	 * Creates the directory (and his parents) if necessary.
 	 * 
 	 * @param dir
-	 *            the directory to create if not exisiting
+	 *            the directory to create if nonexistent
 	 * @return {@code true} if directory was created, {@code false} if was no
 	 *         need to create it
 	 * @throws IOException

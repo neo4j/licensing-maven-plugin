@@ -45,37 +45,37 @@ public interface MavenProjectDependenciesConfigurator {
 
 	/**
 	 * @return list of scopes to include while loading dependencies, if
-	 *         {@code null} is setted, then include all scopes.
+	 *         {@code null} is set, then include all scopes.
 	 */
 	List<String> getIncludedScopes();
 
 	/**
 	 * @return list of scopes to exclude while loading dependencies, if
-	 *         {@code null} is setted, then include all scopes.
+	 *         {@code null} is set, then include all scopes.
 	 */
 	List<String> getExcludedScopes();
 
 	/**
-	 * @return a pattern to include dependencies by thier {@code artificatId},
-	 *         if {@code null} is setted then include all artifacts.
+	 * @return a pattern to include dependencies by their {@code artificatId},
+	 *         if {@code null} is set then include all artifacts.
 	 */
 	String getIncludedArtifacts();
 
 	/**
 	 * @return a pattern to include dependencies by their {@code groupId}, if
-	 *         {@code null} is setted then include all artifacts.
+	 *         {@code null} is set then include all artifacts.
 	 */
 	String getIncludedGroups();
 
 	/**
 	 * @return a pattern to exclude dependencies by their {@code artifactId}, if
-	 *         {@code null} is setted the no exclude is done on artifactId.
+	 *         {@code null} is set the no exclude is done on artifactId.
 	 */
 	String getExcludedGroups();
 
 	/**
 	 * @return a pattern to exclude dependencies by their {@code groupId}, if
-	 *         {@code null} is setted then no exclude is done on groupId.
+	 *         {@code null} is set then no exclude is done on groupId.
 	 */
 	String getExcludedArtifacts();
 

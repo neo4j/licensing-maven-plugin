@@ -135,7 +135,7 @@ public class CheckForFailureTest {
 	}
 
 	@Test
-	public void ignoreLicenseFilesEndOfLineCharactersDuringComparision()
+	public void ignoreLicenseFilesEndOfLineCharactersDuringComparison()
 			throws MojoExecutionException, IOException
 	{
 		CheckMojo checkMojo = new CheckMojo();
