@@ -196,8 +196,9 @@ public class CheckMojo extends AbstractLicensingMojo {
         {
             throw new MojoExecutionException(
                     "Generated file differs from the existing file.\n"
-                            + "Generated: " + file + "\n" + "Existing: "
-                            + existingFile );
+                            + "Generated: " + file + "\n"
+                            + "Existing: " + existingFile + "\n"
+                            + "(Note: Use the flag `-Doverwrite` to automatically overwrite existing with generated)" );
         }
     }
 
