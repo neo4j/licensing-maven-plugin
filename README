@@ -1,12 +1,12 @@
 Getting Started:
 
 
-$ mvn org.linuxstuff.maven:licensing-maven-plugin:check -DfailIfMissing=false
+$ mvn org.neo4j.build.plugins:licensing-maven-plugin:check -DfailIfMissing=false
 
 This will walk through your multimodule project and create
 target/third-party-licensing.xml everywhere.
 
-$ mvn org.linuxstuff.maven:licensing-maven-plugin:collect-reports
+$ mvn org.neo4j.build.plugins:licensing-maven-plugin:collect-reports
 
 This will walk through your multimodule project, finding all those
 third-party-licensing.xml files and aggregate them together into a
@@ -14,7 +14,7 @@ target/aggregated-third-party-licensing.xml.
 
 If you're attaching this to an execution, use:
 
-$ mvn org.linuxstuff.maven:licensing-maven-plugin:aggregate
+$ mvn org.neo4j.build.plugins:licensing-maven-plugin:aggregate
 
 This will only generate a target/aggregated-third-party-licensing.xml in your parent project (without failing your build).
 
@@ -61,7 +61,7 @@ Here's an example of how to bind the plugin into your build:
 ...
 <plugins>
   <plugin>
-    <groupId>org.linuxstuff.maven</groupId>
+    <groupId>org.neo4j.build.plugins</groupId>
     <artifactId>licensing-maven-plugin</artifactId>
     <version>1.5-SNAPSHOT</version>
     <executions>
