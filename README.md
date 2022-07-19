@@ -1,12 +1,17 @@
-Getting Started:
+# Licensing Maven Plugin
 
+## Getting Started
 
+```shell
 $ mvn org.neo4j.build.plugins:licensing-maven-plugin:check -DfailIfMissing=false
+```
 
 This will walk through your multimodule project and create
 target/third-party-licensing.xml everywhere.
 
+```shell
 $ mvn org.neo4j.build.plugins:licensing-maven-plugin:collect-reports
+```
 
 This will walk through your multimodule project, finding all those
 third-party-licensing.xml files and aggregate them together into a
@@ -14,14 +19,17 @@ target/aggregated-third-party-licensing.xml.
 
 If you're attaching this to an execution, use:
 
+```shell
 $ mvn org.neo4j.build.plugins:licensing-maven-plugin:aggregate
+```
 
-This will only generate a target/aggregated-third-party-licensing.xml in your parent project (without failing your build).
+This will only generate a `target/aggregated-third-party-licensing.xml` in your parent project (without failing your build).
 
-------------------------------
+## Examples
 
 Here's an example licensing requirements XML file:
 
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <licensing-requirements>
 
@@ -53,12 +61,11 @@ Here's an example licensing requirements XML file:
         <dislike-exemption>xom:xom:jar:1.0</dislike-exemption>
 
 </licensing-requirements>
-
-------------------------------
+```
 
 Here's an example of how to bind the plugin into your build:
 
-...
+```xml
 <plugins>
   <plugin>
     <groupId>org.neo4j.build.plugins</groupId>
@@ -108,9 +115,9 @@ Here's an example of how to bind the plugin into your build:
   </plugin>
 </plugins>
 
+```
 
-------------------------------
-
-TODO attach aggregated-third-party-licensing.xml to be deployed
-TODO format output XML 
-TODO make a proper maven site for the plugin
+## TODO
+ - attach aggregated-third-party-licensing.xml to be deployed
+ - format output XML 
+ - make a proper maven site for the plugin
