@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.linuxstuff.mojo.licensing.model.ArtifactWithLicenses;
 import org.linuxstuff.mojo.licensing.model.CoalescedLicense;
 import org.linuxstuff.mojo.licensing.model.DualLicense;
+import org.linuxstuff.mojo.licensing.model.LicensingReport;
 import org.linuxstuff.mojo.licensing.model.LicensingRequirements;
 
 import com.thoughtworks.xstream.XStream;
@@ -15,7 +16,13 @@ public class ReadLicensingRequirementsTest {
 	@Test
 	public void xstreamShouldBeAbleToReadTheRequirementsFile() {
 		XStream xstream = new XStream(new StaxDriver());
-
+		xstream.allowTypes(new Class[] {
+                ArtifactWithLicenses.class,
+                CoalescedLicense.class,
+                DualLicense.class,
+                LicensingReport.class,
+                LicensingRequirements.class
+		});
 		xstream.processAnnotations(LicensingRequirements.class);
 		xstream.processAnnotations(ArtifactWithLicenses.class);
 		xstream.processAnnotations(CoalescedLicense.class);

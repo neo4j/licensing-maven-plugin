@@ -8,7 +8,10 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.linuxstuff.mojo.licensing.model.ArtifactWithLicenses;
+import org.linuxstuff.mojo.licensing.model.CoalescedLicense;
+import org.linuxstuff.mojo.licensing.model.DualLicense;
 import org.linuxstuff.mojo.licensing.model.LicensingReport;
+import org.linuxstuff.mojo.licensing.model.LicensingRequirements;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
@@ -48,6 +51,13 @@ public class CollectReportsMojo extends AbstractLicensingMojo {
 		report = new LicensingReport();
 
 		XStream xstream = new XStream(new StaxDriver());
+		xstream.allowTypes(new Class[] {
+                ArtifactWithLicenses.class,
+                CoalescedLicense.class,
+                DualLicense.class,
+                LicensingReport.class,
+                LicensingRequirements.class
+		});
 		xstream.processAnnotations(ArtifactWithLicenses.class);
 		xstream.processAnnotations(LicensingReport.class);
 
