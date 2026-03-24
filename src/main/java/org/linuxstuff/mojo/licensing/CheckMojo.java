@@ -209,10 +209,7 @@ public class CheckMojo extends AbstractLicensingMojo {
 		Collection<MavenProject> projects = getProjectDependencies(project);
 		for (MavenProject mavenProject : projects) {
 
-			ArtifactWithLicenses entry = new ArtifactWithLicenses();
-
-			entry.setArtifactId(mavenProject.getId());
-			entry.setName(mavenProject.getName());
+			ArtifactWithLicenses entry = new ArtifactWithLicenses(mavenProject.getId(),mavenProject.getName(), mavenProject.getVersion());
 
 			Set<String> licenses = collectLicensesForMavenProject(mavenProject);
 
@@ -246,9 +243,7 @@ public class CheckMojo extends AbstractLicensingMojo {
 		}
 		
 		for (ArtifactWithLicenses artifactWithLicenses : licensingRequirements.getMissingArtifacts()) {
-            ArtifactWithLicenses entry = new ArtifactWithLicenses(
-                    artifactWithLicenses.getArtifactId(),
-                    artifactWithLicenses.getName() );
+            ArtifactWithLicenses entry = artifactWithLicenses.copyWithoutLicenses();
             Set<String> licenses = artifactWithLicenses.getLicenses();
 
             if (licenses.isEmpty()) {

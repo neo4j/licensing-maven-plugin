@@ -115,7 +115,7 @@ public class DislikedTest extends AbstractLicensingTest {
 	@Test
 	public void testConfiguredDislike() {
 
-		ArtifactWithLicenses awl = new ArtifactWithLicenses(mavenProject.getId());
+		ArtifactWithLicenses awl = new ArtifactWithLicenses(mavenProject.getId(), mavenProject.getName(), mavenProject.getVersion());
 		awl.addLicense("disliked");
 
 		licensingRequirements.addArtifactMissingLicense(awl);

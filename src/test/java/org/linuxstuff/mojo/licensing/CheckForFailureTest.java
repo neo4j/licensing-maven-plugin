@@ -34,8 +34,8 @@ public class CheckForFailureTest {
 		mojo.failIfDisliked = false;
 		mojo.failIfMissing = false;
 
-		report.addMissingLicense(new ArtifactWithLicenses("missing"));
-		report.addDislikedArtifact(new ArtifactWithLicenses("disliked"));
+		report.addMissingLicense(new ArtifactWithLicenses("missing", "missing", "1.0"));
+		report.addDislikedArtifact(new ArtifactWithLicenses("disliked", "disliked", "1.0"));
 
 		mojo.checkForFailure(report);
 	}
@@ -52,7 +52,7 @@ public class CheckForFailureTest {
 		mojo.failIfDisliked = true;
 		mojo.failIfMissing = false;
 
-		report.addDislikedArtifact(new ArtifactWithLicenses("disliked"));
+		report.addDislikedArtifact(new ArtifactWithLicenses("disliked", "disliked", "1.0"));
 
 		mojo.checkForFailure(report);
 
@@ -70,7 +70,7 @@ public class CheckForFailureTest {
 		mojo.failIfDisliked = false;
 		mojo.failIfMissing = true;
 
-		report.addMissingLicense(new ArtifactWithLicenses("disliked"));
+		report.addMissingLicense(new ArtifactWithLicenses("disliked", "disliked", "1.0"));
 
 		mojo.checkForFailure(report);
 
@@ -90,7 +90,7 @@ public class CheckForFailureTest {
 		mojo.failIfDisliked = false;
 		mojo.failIfMissing = true;
 
-		report.addDislikedArtifact(new ArtifactWithLicenses("disliked"));
+		report.addDislikedArtifact(new ArtifactWithLicenses("disliked", "disliked", "1.0"));
 
 		mojo.checkForFailure(report);
 	}
@@ -109,7 +109,7 @@ public class CheckForFailureTest {
 		mojo.failIfDisliked = true;
 		mojo.failIfMissing = false;
 
-		report.addMissingLicense(new ArtifactWithLicenses("missing"));
+		report.addMissingLicense(new ArtifactWithLicenses("missing", "missing", "1.0"));
 
 		mojo.checkForFailure(report);
 	}
@@ -128,8 +128,8 @@ public class CheckForFailureTest {
 		mojo.failIfDisliked = true;
 		mojo.failIfMissing = true;
 
-		report.addMissingLicense(new ArtifactWithLicenses("missing"));
-		report.addDislikedArtifact(new ArtifactWithLicenses("disliked"));
+		report.addMissingLicense(new ArtifactWithLicenses("missing", "missing", "1.0"));
+		report.addDislikedArtifact(new ArtifactWithLicenses("disliked", "disliked", "1.0"));
 
 		mojo.checkForFailure(report);
 	}

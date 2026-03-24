@@ -36,7 +36,7 @@ public class LicenseCollectionTest extends AbstractLicensingTest {
 
 		assertEquals(0, mojo.collectLicensesForMavenProject(mavenProject).size());
 
-		ArtifactWithLicenses awl = new ArtifactWithLicenses(mavenProject.getId());
+		ArtifactWithLicenses awl = new ArtifactWithLicenses(mavenProject.getId(), mavenProject.getName(), mavenProject.getVersion());
 		licensingRequirements.addArtifactMissingLicense(awl);
 
 		assertEquals(0, mojo.collectLicensesForMavenProject(mavenProject).size());
@@ -64,7 +64,7 @@ public class LicenseCollectionTest extends AbstractLicensingTest {
 		mavenProject.getLicenses().add(license);
 		assertEquals(1, mojo.collectLicensesForMavenProject(mavenProject).size());
 
-		ArtifactWithLicenses awl = new ArtifactWithLicenses(mavenProject.getId());
+		ArtifactWithLicenses awl = new ArtifactWithLicenses(mavenProject.getId(), mavenProject.getName(), mavenProject.getVersion());
 		awl.addLicense("hello1");
 		awl.addLicense("hello2");
 		awl.addLicense("hello3");

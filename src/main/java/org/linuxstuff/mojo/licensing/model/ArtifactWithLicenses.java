@@ -18,27 +18,22 @@ public class ArtifactWithLicenses {
 	@XStreamAlias("name")
 	private String name;
 
+	@XStreamAsAttribute
+	@XStreamAlias("version")
+	private String version;
+
 	@XStreamImplicit(itemFieldName = "license")
 	private Set<String> licenses;
 
-	public ArtifactWithLicenses() {
-		licenses = new HashSet<String>();
+	public ArtifactWithLicenses(String artifactId, String name, String version) {
+		this.artifactId = artifactId;
+		this.name = name;
+		this.version = version;
+		this.licenses = new HashSet<>();
 	}
 
-	public ArtifactWithLicenses(String artifactId) {
-		this.artifactId = artifactId;
-		this.licenses = new HashSet<String>();
-	}
-
-	public ArtifactWithLicenses(String artifactId, Set<String> licenses) {
-		this.artifactId = artifactId;
-		this.licenses = licenses;
-	}
-	
-	public ArtifactWithLicenses(String artifactId, String name) {
-        licenses = new HashSet<String>();
-        this.artifactId = artifactId;
-        this.name = name;
+	public ArtifactWithLicenses copyWithoutLicenses() {
+		return new ArtifactWithLicenses(artifactId, name, version);
 	}
 
 	public void combineWith(ArtifactWithLicenses other) {
@@ -71,6 +66,14 @@ public class ArtifactWithLicenses {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
 	}
 
 	@Override

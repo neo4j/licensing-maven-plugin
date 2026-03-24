@@ -1,6 +1,8 @@
 package org.linuxstuff.mojo.licensing;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -14,19 +16,19 @@ public class ArtifactWithLicensesComparisonTest {
 	 */
 	@Test
 	public void test() {
-		ArtifactWithLicenses awl1 = new ArtifactWithLicenses("artifactA");
-		ArtifactWithLicenses awl2 = new ArtifactWithLicenses("artifactB");
+		ArtifactWithLicenses awl1 = new ArtifactWithLicenses("artifactA", "artifactA", "1.0");
+		ArtifactWithLicenses awl2 = new ArtifactWithLicenses("artifactB", "artifactB", "1.0");
 
-		ArtifactWithLicenses awl3 = new ArtifactWithLicenses("artifactA");
+		ArtifactWithLicenses awl3 = new ArtifactWithLicenses("artifactA", "artifactA2", "1.2");
 
-		assertFalse("ArtifactWithLicenses are compared only on artifactId.", awl1.equals(awl2));
-		assertTrue("ArtifactWithLicenses are compared only on artifactId.", awl1.equals(awl3));
+        assertNotEquals("ArtifactWithLicenses are compared only on artifactId.", awl1, awl2);
+        assertEquals("ArtifactWithLicenses are compared only on artifactId.", awl1, awl3);
 
 		awl1.addLicense("one two");
 		awl2.addLicense("one two");
 
-		assertFalse("ArtifactWithLicenses are compared only on artifactId.", awl1.equals(awl2));
-		assertTrue("ArtifactWithLicenses are compared only on artifactId.", awl1.equals(awl3));
+        assertNotEquals("ArtifactWithLicenses are compared only on artifactId.", awl1, awl2);
+        assertEquals("ArtifactWithLicenses are compared only on artifactId.", awl1, awl3);
 
 	}
 

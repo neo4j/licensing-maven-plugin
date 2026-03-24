@@ -4,6 +4,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
+import java.util.Comparator;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.resource.ResourceManager;
 import org.codehaus.plexus.resource.loader.FileResourceCreationException;
@@ -191,29 +192,41 @@ public class LicensingReport {
         }
     }
 
+	private static class ArtifactVersionPair {
+		private static final Comparator<ArtifactVersionPair> COMPARATOR = Comparator.comparing(ArtifactVersionPair::getArtifactName, String.CASE_INSENSITIVE_ORDER);
+		private final String artifactName;
+		private final String artifactVersion;
+
+        private ArtifactVersionPair(String artifactName, String artifactVersion) {
+            this.artifactName = artifactName;
+            this.artifactVersion = artifactVersion;
+        }
+
+        public String getArtifactName() {
+            return artifactName;
+        }
+
+        public String getArtifactVersion() {
+            return artifactVersion;
+        }
+    }
+
     private void generateTextReport( PrintWriter writer,
             ResourceManager locator, boolean includeDualList, boolean includeFullLicense )
             throws IOException, MojoExecutionException
     {
-        SortedMap<String,SortedSet<String>> artifactsPerLicense = new TreeMap<String,SortedSet<String>>();
-        SortedMap<String,SortedSet<String>> multiLicensed = new TreeMap<String,SortedSet<String>>();
+        SortedMap<String,SortedSet<ArtifactVersionPair>> artifactsPerLicense = new TreeMap<>();
+        SortedMap<ArtifactVersionPair,SortedSet<String>> multiLicensed = new TreeMap<>(ArtifactVersionPair.COMPARATOR);
 	    for (ArtifactWithLicenses awl : getLicensedArtifacts()) {
-	        String artifactName = awl.getName();
-	        Set<String> licenses = awl.getLicenses();
-	        for (String license : licenses) {
-	            SortedSet<String> artifacts = artifactsPerLicense.get( license );
-	            if (artifacts == null) {
-	                artifacts = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
-	                artifactsPerLicense.put( license, artifacts );
-	            }
-	            artifacts.add( artifactName );
+            ArtifactVersionPair artifactVersionPair = new ArtifactVersionPair(awl.getName(), awl.getVersion());
+			Set<String> licenses = awl.getLicenses();
+			for (String license : licenses) {
+
+				SortedSet<ArtifactVersionPair> artifacts = artifactsPerLicense.computeIfAbsent(license, k -> new TreeSet<>(ArtifactVersionPair.COMPARATOR));
+				artifacts.add(artifactVersionPair);
 	            if (licenses.size() > 1) {
-	                SortedSet<String> artifactLicenses = multiLicensed.get( artifactName );
-	                if (artifactLicenses==null) {
-	                    artifactLicenses = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
-	                    multiLicensed.put( artifactName, artifactLicenses );
-	                }
-	                artifactLicenses.add( license );	                
+                    SortedSet<String> artifactLicenses = multiLicensed.computeIfAbsent(artifactVersionPair, k -> new TreeSet<>(String.CASE_INSENSITIVE_ORDER));
+                    artifactLicenses.add( license );
 	            }
 	        }
         }
@@ -222,7 +235,7 @@ public class LicensingReport {
 	        writer.println( "Third-party licenses" );
             writer.println( "--------------------" );
 	    }
-	    for ( Entry<String,SortedSet<String>> entry : artifactsPerLicense.entrySet()) {
+	    for ( Entry<String,SortedSet<ArtifactVersionPair>> entry : artifactsPerLicense.entrySet()) {
 	        if (includeFullLicense)
 	        {
                 writer.println( LINE );
@@ -232,8 +245,8 @@ public class LicensingReport {
 	            writer.println();
 	        }
 	        writer.println(entry.getKey());
-	        for (String artifactName : entry.getValue()) {
-	            writer.println("  " + artifactName);
+	        for (ArtifactVersionPair artifact : entry.getValue()) {
+	            writer.println("  " + artifact.getArtifactName() + " - " + artifact.getArtifactVersion());
 	        }
 	        if (includeFullLicense)
 	        {
@@ -243,12 +256,12 @@ public class LicensingReport {
 	        }
 	    }
         writer.println();
-	    if (multiLicensed.size() > 0) {
+	    if (!multiLicensed.isEmpty()) {
 	        writer.println("Dependencies with multiple licenses");
             writer.println("-----------------------------------");
-            for ( Entry<String,SortedSet<String>> entry : multiLicensed.entrySet()) {
+            for ( Entry<ArtifactVersionPair,SortedSet<String>> entry : multiLicensed.entrySet()) {
                 writer.println();
-                writer.println(entry.getKey());
+                writer.println(entry.getKey().getArtifactName() + " - " + entry.getKey().getArtifactVersion());
                 for (String licenseName : entry.getValue()) {
                     writer.println("  " + licenseName);
                 }

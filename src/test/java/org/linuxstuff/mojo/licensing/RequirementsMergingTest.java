@@ -79,16 +79,16 @@ public class RequirementsMergingTest extends AbstractLicensingTest {
 		LicensingRequirements l2 = new LicensingRequirements();
 		LicensingRequirements l3 = new LicensingRequirements();
 
-		ArtifactWithLicenses awl1 = new ArtifactWithLicenses("artifact");
+		ArtifactWithLicenses awl1 = new ArtifactWithLicenses("artifact", "artifact", "1.0");
 
 		awl1.addLicense("license1");
 
-		ArtifactWithLicenses awl2 = new ArtifactWithLicenses("artifact");
+		ArtifactWithLicenses awl2 = new ArtifactWithLicenses("artifact", "artifact", "1.0");
 
 		awl2.addLicense("license1");
 		awl2.addLicense("license2");
 
-		ArtifactWithLicenses awl3 = new ArtifactWithLicenses("artifact");
+		ArtifactWithLicenses awl3 = new ArtifactWithLicenses("artifact", "artifact", "1.0");
 
 		awl3.addLicense("license1");
 		awl3.addLicense("license2");

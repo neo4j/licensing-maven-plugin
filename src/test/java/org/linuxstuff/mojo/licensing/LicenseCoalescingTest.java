@@ -70,7 +70,7 @@ public class LicenseCoalescingTest extends AbstractLicensingTest {
 
 		licensingRequirements.addCoalescedLicense(coalescedLicense);
 
-		ArtifactWithLicenses awl = new ArtifactWithLicenses(mavenProject.getId());
+		ArtifactWithLicenses awl = new ArtifactWithLicenses(mavenProject.getId(), mavenProject.getName(), mavenProject.getVersion());
 		awl.addLicense("finalname");
 
 		licensingRequirements.addArtifactMissingLicense(awl);
